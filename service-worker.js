@@ -14,10 +14,10 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.e52bb8a2bc59bdcbf930ec4b8c38eb0a.js"
+  "/precache-manifest.3db204fa27b4ff473e9eda85fc16a7fb.js"
 );
 
-workbox.clientsClaim();
+workbox.core.setCacheNameDetails({prefix: "h5-pwa"});
 
 /**
  * The workboxSW.precacheAndRoute() method efficiently caches and responds to
@@ -27,8 +27,3 @@ workbox.clientsClaim();
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
-
-workbox.routing.registerNavigationRoute("/index.html", {
-  
-  blacklist: [/^\/_/,/\/[^\/]+\.[^\/]+$/],
-});
