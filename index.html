@@ -112,6 +112,7 @@
       audioRecorder = new MediaRecorder(audioStream, options);
     } catch (e) {
       console.error('Exception while creating audioRecorder:', e);
+      alert('录音失败');
       return;
     }
 
@@ -142,8 +143,11 @@
   pa.onclick = function () {
     if (!recordedAudioBlobs || recordedAudioBlobs.length === 0) {
       console.log(recordedAudioBlobs)
+      document.write(recordedAudioBlobs)
       return alert('请先录音');
     }
+    audio.load();
+    audio.pause(); 
     audio.play();
   }
 </script>
