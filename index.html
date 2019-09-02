@@ -107,7 +107,7 @@
       return alert('请开启声道');
     }
     recordedAudioBlobs = [];
-    let options = { mimeType: 'audio/webm;codecs=vp9' };
+    let options = { mimeType: 'audio/webm' };
     try {
       audioRecorder = new MediaRecorder(audioStream, options);
     } catch (e) {
