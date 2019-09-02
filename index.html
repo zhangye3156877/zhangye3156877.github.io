@@ -6,31 +6,142 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
+  <style>
+    .btn {
+      width: 58px;
+      height: 20px;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      display: inline-block;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #file {
+      display: none;
+    }
+
+    #img {
+      width: 300px;
+    }
+
+    #audio {
+      vertical-align: middle;
+      outline: none;
+    }
+  </style>
 </head>
 
 <body>
-
+  <div>
+    <div>
+      <h1>图像预览</h1>
+      <h2>1美化label，隐藏input</h2>
+      <h2>2filereader</h2>
+      <label id="btn-photo" for="file" class="btn">图片预览</label>
+      <input type="file" id="file">
+      <img src="" alt="" id="img">
+    </div>
+    <div>
+      <h1>RTC音频</h1>
+      <audio src="" id="audio" controls></audio>
+      <div class="btn" id="open-audio">开启声道</div>
+      <div class="btn" id="close-audio">关闭声道</div>
+      <div class="btn" id="start-audio">开始录音</div>
+      <div class="btn" id="end-audio">停止录音</div>
+      <div class="btn" id="play-audio">播放录音</div>
+    </div>
+  </div>
 </body>
 <script>
-  let permission = Notification.permission;
-  setInterval(() => {
-    console.log(permission)
-  }, 1000);
-  if (permission == "granted") {
-    // 已同意，开始发送通知
-    console.log(888)
-    const notice = new Notification("前端宇宙情报局", {
-      body: "这20个不常用的Web API真的有用吗?，别问，问就是有用🈶",
-      icon: "我的掘金头像",
-      data: {
-        url: "https://www.baidu.com"
-      }
+  var b1 = document.getElementById('btn-photo');
+  var file = document.getElementById('file');
+  var img = document.getElementById('img');
+  var audio = document.getElementById('audio');
+  var sa = document.getElementById('start-audio');
+  var ea = document.getElementById('end-audio');
+  var oa = document.getElementById('open-audio');
+  var ca = document.getElementById('close-audio');
+  var pa = document.getElementById('play-audio');
+
+  // 图片预览
+  file.onchange = function () {
+    const file = this.files[0];
+    const reader = new FileReader();
+    reader.onload = function () {
+      img.src = reader.result;
+    }
+    reader.readAsDataURL(file);
+  }
+  // 音频
+  var audioStream;
+  var recordedAudioBlobs;
+  var audioRecorder
+
+  oa.onclick = function () {
+    constraints = {
+      video: false,
+      audio: true
+    }
+    let promise = navigator.mediaDevices.getUserMedia(constraints);
+    promise.then(function (MediaStream) {
+      audioStream = MediaStream;
+      var tracks = MediaStream.getAudioTracks();
+      console.log('Got stream with constraints:', constraints);
+      console.log('Using video device: ' + tracks[0].label);
+      //audio.srcObject = MediaStream;
+      //video.play();
     });
-  } else if (permission == "denied") {
-    // 不同意，发不了咯
-  } else {
-    // 其他状态，可以重新发送授权提示
-    Notification.requestPermission();
+  }
+  ca.onclick = function () {
+    audioStream.getTracks()[0].stop();
+    audioStream = null;
+  }
+  sa.onclick = function () {
+    if (!audioStream) {
+      alert('请开启声道');
+    }
+    recordedAudioBlobs = [];
+    let options = { mimeType: 'audio/webm' };
+    try {
+      audioRecorder = new MediaRecorder(audioStream, options);
+    } catch (e) {
+      console.error('Exception while creating audioRecorder:', e);
+      return;
+    }
+
+    console.log('Created audioRecorder', audioRecorder, 'with options', options);
+    audioRecorder.onstop = (event) => {
+      console.log('Recorder stopped: ', event);
+    };
+    // push 
+    audioRecorder.ondataavailable = function (e) {
+      if (e.data && e.data.size > 0) {
+        recordedAudioBlobs.push(e.data);
+      }
+    };
+    audioRecorder.start(10); // collect 10ms of data
+    console.log('audioRecorder started', audioRecorder);
+  }
+  ea.onclick = function () {
+    if (!audioStream) {
+      alert('请开启声道');
+    }
+    audioRecorder.stop();
+  }
+  pa.onclick = function () {
+    if (!audioStream) {
+      alert('请开启声道');
+    }
+    const superBuffer = new Blob(recordedAudioBlobs, { type: 'audio/webm' });
+    audio.src = null;
+    audio.srcObject = null;
+    audio.src = window.URL.createObjectURL(superBuffer);
+    audio.play();
   }
 </script>
 
