@@ -48,7 +48,7 @@
       <img src="" alt="" id="img">
     </div>
     <div>
-      <h1>RTC音频</h1>
+      <h1>RTC音频v1.0</h1>
       <audio src="" id="audio" controls></audio>
       <div class="btn" id="open-audio">开启声道</div>
       <div class="btn" id="close-audio">关闭声道</div>
@@ -107,7 +107,7 @@
       return alert('请开启声道');
     }
     recordedAudioBlobs = [];
-    let options = { mimeType: 'audio/webm' };
+    let options = { mimeType: 'audio/webm;codecs=vp9' };
     try {
       audioRecorder = new MediaRecorder(audioStream, options);
     } catch (e) {
@@ -134,9 +134,9 @@
       return alert('请开启声道');
     }
     audioRecorder.stop();
-    const superBuffer = new Blob(recordedAudioBlobs, { type: 'audio/webm' });
+    const superBuffer = new Blob(recordedAudioBlobs);
     audio.src = null;
-    audio.srcObject = null;
+    // audio.srcObject = null;
     audio.src = window.URL.createObjectURL(superBuffer);
     audio.controls = true;
   }
